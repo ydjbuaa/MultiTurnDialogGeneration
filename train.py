@@ -109,8 +109,9 @@ def train_model(model, train_set, valid_set, vocab, optim):
             # Exclude original indices.
             batch_turns, turn_mask = train_set[batch_idx]
             utter_hidden = None
-            optim.zero_grad()
+
             for k in range(len(batch_turns) - 1):
+                optim.zero_grad()
                 src_turn = batch_turns[k]
                 trg_turn = batch_turns[k + 1]
                 outputs, utter_hidden = model(src_turn, trg_turn[:-1], utter_hidden)
@@ -132,8 +133,8 @@ def train_model(model, train_set, valid_set, vocab, optim):
                 report_loss += loss_k / (len(batch_turns) - 1)
                 total_loss += loss_k / (len(batch_turns) - 1)
 
-            # Update the parameters.
-            optim.step()
+                # Update the parameters.
+                optim.step()
 
             if i % configs['log_interval'] == -1 % configs['log_interval']:
                 print(("Epoch %2d, %5d/%5d; acc: %6.2f; ppl: %6.2f; " +
@@ -207,12 +208,12 @@ def main():
     train_set = Dataset(dataset['train']['data'],
                         configs['batch_size'],
                         cuda=configs['cuda'],
-                        volatile=False, ret_limit=2000)
+                        volatile=False)
 
     valid_set = Dataset(dataset['valid']['data'],
                         configs['batch_size'],
                         cuda=configs['cuda'],
-                        volatile=True, ret_limit=200)
+                        volatile=True, ret_limit=1000)
 
     vocab = dataset['vocab']
     configs['vocab_size'] = vocab.size
